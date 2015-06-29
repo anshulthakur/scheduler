@@ -5,6 +5,17 @@
 
 {% block content %}
 <div class="container">
-    <p> Nothing exists yet. Start creating!</p>
+    <h1>Your To-Do List</h1>
+    <form method="POST" action="/">
+        <input name="item_text" placeholder="Enter a To-Do Item" id="id_new_item"/>
+        {% csrf_token %}
+    </form>
+    <div>
+	    <table id="id_list_table">
+	        <tr>
+	           <td>{{ new_item_text }}</td>
+	        </tr>
+	    </table>
+    </div>
 </div>
 {% endblock %}

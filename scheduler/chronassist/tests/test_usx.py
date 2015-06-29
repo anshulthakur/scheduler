@@ -1,6 +1,7 @@
 from django.test import TestCase
 import unittest
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
 # Create your tests here.
 
@@ -13,14 +14,44 @@ class FunctionalTest(TestCase):
     def tearDown(self):
         self.browser.quit()
         
+    def create_item_in_list(self, item_text=None):
+        form_input = self.browser.find_element_by_id('id_new_item')
+        self.assertEqual(  
+                form_input.get_attribute('placeholder'),
+                'Enter a To-Do Item'
+                )
+        
+        #3. User enters to-do element and presses enter/submit
+        form_input.send_keys(item_text)
+        
+        #4. Page reloads with his entry as to-do list item and form empty
+        form_input.send_keys(Keys.ENTER)
+
         
     def test_USX(self):
-#1. User visits page
-#2. User sees form to make quick to-do list
-#3. User enters to-do element and presses enter/submit
-#4. Page reloads with his entry as to-do list item and form empty
-#5. He enters another one and presses submit
-#6. He sees this entry after the first entry
+        #1. User visits page
+        self.browser.get("http://localhost:8000")
+        #2. User sees form to make quick to-do list titled 'Your To-Do List'
+        self.assertIn('To-Do', self.browser.title)
+        form_title = self.browser.find_element_by_tag_name('h1').text
+        self.assertIn('Your To-Do List', form_title)
+        
+        #Create an entry in table
+        self.create_item_in_list('Make a scheduler project test case')
+                
+        #He notes that the entry has been created.
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn('Make a scheduler project test case', [row.text for row in rows])
+        
+        #5. He enters another one and presses submit
+        self.create_item_in_list('Make a scheduler project model too')
+        #6. He sees this entry after the first entry
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn('Make a scheduler project test case', [row.text for row in rows])
+        self.assertIn('Make a scheduler project model too', [row.text for row in rows])
+        self.fail('Finish the test!')
 #7. He wants the second to be the first, so he drags second above first and drops
 #8. He reloads page and the ordering is maintained.
 #9. He notices a create job button next to the form
